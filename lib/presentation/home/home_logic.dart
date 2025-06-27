@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:palm_code_arman/application/book_app_service.dart';
 import 'package:palm_code_arman/presentation/home/home_state.dart';
@@ -5,6 +7,7 @@ import 'package:palm_code_arman/presentation/home/home_state.dart';
 class HomeLogic extends GetxController {
   HomeState state = HomeState();
   final BookAppService _bookAppService = BookAppService();
+  Timer? _debounce;
 
   @override
   void onInit() {
@@ -13,12 +16,20 @@ class HomeLogic extends GetxController {
     super.onInit();
   }
 
+  @override
+  void onClose() {
+    _debounce?.cancel();
+    state.scrollController.dispose();
+    state.searchController.dispose();
+    super.onClose();
+  }
+
   void getBooks() async {
     state.isLoading.value = true;
     final data = await _bookAppService.getBooks();
     state.isLoading.value = false;
     data.fold((l) => Get.log("ada error nih bos $l"), (r) {
-      state.books.addAll(r.results);
+      state.books.assignAll(r.results);
       state.nextPageUrl = r.next;
     });
   }
@@ -40,5 +51,30 @@ class HomeLogic extends GetxController {
         getMoreBook(url: state.nextPageUrl);
       }
     }
+  }
+
+  void searchBooks(String? value) {
+    _debounce?.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      if (value == null || value.trim().isEmpty) return;
+
+      state.search.value = value;
+      state.isLoading.value = true;
+
+      final data = await _bookAppService.searchBook(value);
+
+      state.isLoading.value = false;
+      data.fold((l) => Get.log("ada error nih bos $l"), (r) {
+        state.books.assignAll(r.results);
+        state.nextPageUrl = r.next;
+      });
+    });
+  }
+
+  void onClearSearch() {
+    state.searchController.text = "";
+    state.search.value = "";
+    getBooks();
   }
 }

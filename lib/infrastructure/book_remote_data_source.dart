@@ -22,4 +22,23 @@ class BookRemoteDataSource implements BookRemoteInterface {
       return Left(e);
     }
   }
+
+  @override
+  Future<Either<HttpException, BooksResponse>> searchBooks(
+    String search,
+  ) async {
+    try {
+      final pageUrl = Uri.parse("https://gutendex.com/books?search=$search");
+
+      final response = await http.get(pageUrl);
+
+      if (response.statusCode == 200) {
+        return Right(BooksResponse.fromRawJson(response.body));
+      } else {
+        throw Exception('Failed to load books: ${response.statusCode}');
+      }
+    } on HttpException catch (e) {
+      return Left(e);
+    }
+  }
 }

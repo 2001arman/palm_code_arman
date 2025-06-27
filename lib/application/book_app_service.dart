@@ -10,4 +10,7 @@ class BookAppService {
 
   Future<Either<HttpException, BooksResponse>> getBooks({String? url}) =>
       bookRemoteData.getBooks(url ?? "https://gutendex.com/books/?page=1");
+
+  Future<Either<HttpException, BooksResponse>> searchBook(String search) =>
+      bookRemoteData.searchBooks(search);
 }

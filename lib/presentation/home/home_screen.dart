@@ -37,7 +37,7 @@ class HomeScreen extends StatelessWidget {
                     Obx(
                       () => TextField(
                         controller: state.searchController,
-                        onChanged: (value) => state.search.value = value,
+                        onChanged: logic.searchBooks,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
@@ -46,10 +46,7 @@ class HomeScreen extends StatelessWidget {
                           hintText: "Search books",
                           suffixIcon: state.search.value != ""
                               ? IconButton(
-                                  onPressed: () {
-                                    state.searchController.text = "";
-                                    state.search.value = "";
-                                  },
+                                  onPressed: logic.onClearSearch,
                                   icon: Icon(Icons.clear),
                                 )
                               : null,
