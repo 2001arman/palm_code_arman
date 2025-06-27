@@ -2,11 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:palm_code_arman/presentation/detail/detail_logic.dart';
+import 'package:palm_code_arman/presentation/home/home_logic.dart';
 import 'package:palm_code_arman/presentation/widgets/subject_item.dart';
 
 class DetailScreen extends StatelessWidget {
   static const String namePath = "/detail_screen";
   final logic = Get.find<DetailLogic>();
+  final homeLogic = Get.find<HomeLogic>();
   DetailScreen({super.key});
 
   @override
@@ -16,8 +18,22 @@ class DetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(logic.book.authorName),
         backgroundColor: Colors.white,
-        actions: [Icon(Icons.favorite_border), SizedBox(width: 20)],
+        actions: [
+          Obx(() {
+            final isFavorite = logic.book.isFavorite?.value ?? false;
+
+            return IconButton(
+              onPressed: () => homeLogic.favoriteBookAction(logic.book),
+              icon: Icon(
+                isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: Colors.red,
+              ),
+            );
+          }),
+          const SizedBox(width: 8),
+        ],
       ),
+
       body: ListView(
         padding: EdgeInsets.all(20),
         children: [

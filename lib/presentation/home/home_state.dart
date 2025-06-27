@@ -8,6 +8,8 @@ class HomeState {
   RxString search = ''.obs;
 
   RxList<Book> books = <Book>[].obs;
+  RxList<Book> favorites = <Book>[].obs;
+
   RxBool isLoading = true.obs;
   RxBool isLoadingMore = false.obs;
   RxBool isErrorFetch = false.obs;

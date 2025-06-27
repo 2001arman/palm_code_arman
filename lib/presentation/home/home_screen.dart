@@ -46,11 +46,19 @@ class HomeScreen extends StatelessWidget {
           crossAxisSpacing: 14,
           childAspectRatio: 0.45,
         ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) =>
-              IntrinsicHeight(child: CardItem(book: state.books[index])),
-          childCount: state.books.length,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final book = state.books[index];
+          final isFavorite = state.favorites.any((f) => f.id == book.id);
+          book.isFavorite?.value = isFavorite;
+
+          return IntrinsicHeight(
+            child: CardItem(
+              book: state.books[index],
+              isFavorite: book.isFavorite!,
+              onFavoriteBook: logic.favoriteBookAction,
+            ),
+          );
+        }, childCount: state.books.length),
       );
     }
 

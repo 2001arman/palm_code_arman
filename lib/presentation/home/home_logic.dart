@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:palm_code_arman/application/book_app_service.dart';
+import 'package:palm_code_arman/domain/models/book.dart';
 import 'package:palm_code_arman/presentation/home/home_state.dart';
 import 'package:palm_code_arman/presentation/widgets/error_snackbar.dart';
 
@@ -13,8 +14,9 @@ class HomeLogic extends GetxController {
 
   @override
   void onInit() {
+    getFavoriteBook();
     // 1. get the local books as a initial data
-    // getLocalBooks();
+    getLocalBooks();
     // 2. get the actual books data from the API
     getBooks();
 
@@ -107,5 +109,27 @@ class HomeLogic extends GetxController {
     state.searchController.text = "";
     state.search.value = "";
     getBooks();
+  }
+
+  void getFavoriteBook() async {
+    final data = await _bookAppService.getFavoriteBooks();
+    state.favorites.assignAll(data);
+  }
+
+  void favoriteBookAction(Book book) {
+    final isAlreadyFavorite = state.favorites.any((f) => f.id == book.id);
+
+    if (isAlreadyFavorite) {
+      state.favorites.removeWhere((f) => f.id == book.id);
+      book.isFavorite?.value = false;
+      _bookAppService.removeFavoriteBook(book: book);
+    } else {
+      state.favorites.add(book);
+      book.isFavorite?.value = true;
+      _bookAppService.addFavoriteBook(book: book);
+    }
+
+    book.isFavorite?.refresh();
+    state.favorites.refresh();
   }
 }

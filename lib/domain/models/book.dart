@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'author.dart'; // Make sure Author is also a HiveObject
 import 'formats.dart'; // Make sure Formats is also a HiveObject
@@ -25,6 +26,8 @@ class Book extends HiveObject {
   @HiveField(5)
   Formats formats;
 
+  RxBool? isFavorite;
+
   Book({
     required this.id,
     required this.title,
@@ -32,6 +35,7 @@ class Book extends HiveObject {
     required this.summaries,
     required this.subjects,
     required this.formats,
+    this.isFavorite,
   });
 
   String get authorName {
@@ -48,8 +52,6 @@ class Book extends HiveObject {
     summaries: List<String>.from(json["summaries"].map((x) => x)),
     subjects: List<String>.from(json["subjects"].map((x) => x)),
     formats: Formats.fromJson(json["formats"]),
+    isFavorite: false.obs,
   );
 }
-
-
-
