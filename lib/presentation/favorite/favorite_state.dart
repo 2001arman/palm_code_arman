@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:palm_code_arman/domain/models/books_response.dart';
+import 'package:palm_code_arman/domain/models/book.dart';
 
 class FavoriteState {
   TextEditingController searchController = TextEditingController();

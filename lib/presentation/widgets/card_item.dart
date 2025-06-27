@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:palm_code_arman/domain/models/books_response.dart';
+import 'package:palm_code_arman/domain/models/book.dart';
 import 'package:palm_code_arman/presentation/detail/detail_screen.dart';
 
 class CardItem extends StatelessWidget {
