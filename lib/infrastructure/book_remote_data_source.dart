@@ -20,6 +20,10 @@ class BookRemoteDataSource implements BookRemoteInterface {
       }
     } on HttpException catch (e) {
       return Left(e);
+    } on http.ClientException catch (e) {
+      return Left(HttpException(e.message));
+    } catch (e) {
+      return Left(HttpException(e.toString()));
     }
   }
 
@@ -39,6 +43,10 @@ class BookRemoteDataSource implements BookRemoteInterface {
       }
     } on HttpException catch (e) {
       return Left(e);
+    } on http.ClientException catch (e) {
+      return Left(HttpException(e.message));
+    } catch (e) {
+      return Left(HttpException(e.toString()));
     }
   }
 }

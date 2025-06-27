@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:palm_code_arman/application/book_app_service.dart';
 import 'package:palm_code_arman/presentation/home/home_state.dart';
+import 'package:palm_code_arman/presentation/widgets/error_snackbar.dart';
 
 class HomeLogic extends GetxController {
   HomeState state = HomeState();
@@ -11,7 +13,11 @@ class HomeLogic extends GetxController {
 
   @override
   void onInit() {
+    // 1. get the local books as a initial data
+    getLocalBooks();
+    // 2. get the actual books data from the API
     getBooks();
+
     state.scrollController.addListener(_onScroll);
     super.onInit();
   }
@@ -24,24 +30,39 @@ class HomeLogic extends GetxController {
     super.onClose();
   }
 
+  void getLocalBooks() async {
+    final data = await _bookAppService.loadCachedBooks();
+    state.books.assignAll(data);
+    state.isLoading.value = false;
+  }
+
   void getBooks() async {
-    state.isLoading.value = true;
     final data = await _bookAppService.getBooks();
     state.isLoading.value = false;
-    data.fold((l) => Get.log("ada error nih bos $l"), (r) {
-      state.books.assignAll(r.results);
-      state.nextPageUrl = r.next;
-    });
+    data.fold(
+      (l) => ScaffoldMessenger.of(
+        Get.context!,
+      ).showSnackBar(errorSnackbar(errorText: "Error, ${l.message}")),
+      (r) {
+        state.books.assignAll(r.results);
+        state.nextPageUrl = r.next;
+      },
+    );
   }
 
   void getMoreBook({String? url}) async {
     state.isLoadingMore.value = true;
     final data = await _bookAppService.getBooks(url: url);
     state.isLoadingMore.value = false;
-    data.fold((l) => Get.log("ada error nih bos $l"), (r) {
-      state.books.addAll(r.results);
-      state.nextPageUrl = r.next;
-    });
+    data.fold(
+      (l) => ScaffoldMessenger.of(
+        Get.context!,
+      ).showSnackBar(errorSnackbar(errorText: "Error, ${l.message}")),
+      (r) {
+        state.books.addAll(r.results);
+        state.nextPageUrl = r.next;
+      },
+    );
   }
 
   void _onScroll() {
@@ -65,10 +86,15 @@ class HomeLogic extends GetxController {
       final data = await _bookAppService.searchBook(value);
 
       state.isLoading.value = false;
-      data.fold((l) => Get.log("ada error nih bos $l"), (r) {
-        state.books.assignAll(r.results);
-        state.nextPageUrl = r.next;
-      });
+      data.fold(
+        (l) => ScaffoldMessenger.of(
+          Get.context!,
+        ).showSnackBar(errorSnackbar(errorText: "Error, ${l.message}")),
+        (r) {
+          state.books.assignAll(r.results);
+          state.nextPageUrl = r.next;
+        },
+      );
     });
   }
 
