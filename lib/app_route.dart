@@ -1,0 +1,14 @@
+import 'package:get/get_navigation/src/routes/get_route.dart';
+import 'package:palm_code_arman/presentation/home/home_binding.dart';
+import 'package:palm_code_arman/presentation/home/home_screen.dart';
+
+class AppRoute {
+  static String initialRoute = HomeScreen.namePath;
+  static final routes = [
+    GetPage(
+      name: HomeScreen.namePath,
+      page: () => HomeScreen(),
+      binding: HomeBinding(),
+    ),
+  ];
+}
