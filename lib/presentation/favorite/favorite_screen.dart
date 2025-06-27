@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:palm_code_arman/presentation/favorite/favorite_screen.dart';
-import 'package:palm_code_arman/presentation/home/home_logic.dart';
+import 'package:palm_code_arman/presentation/favorite/favorite_logic.dart';
 import 'package:palm_code_arman/presentation/widgets/card_item.dart';
 import 'package:palm_code_arman/presentation/widgets/custom_sliver_app_bar.dart';
+import 'package:palm_code_arman/presentation/widgets/empty_info.dart';
 
-class HomeScreen extends StatelessWidget {
-  static String namePath = "/home_screen";
-  final logic = Get.find<HomeLogic>();
-  final state = Get.find<HomeLogic>().state;
-  HomeScreen({super.key});
+class FavoriteScreen extends StatelessWidget {
+  static const String namePath = "/favorite_screen";
+  final logic = Get.find<FavoriteLogic>();
+  final state = Get.find<FavoriteLogic>().state;
+  FavoriteScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,17 +20,10 @@ class HomeScreen extends StatelessWidget {
         slivers: [
           // app bar
           CustomSliverAppBar(
-            title: 'Palm Code Test Arman',
-            actions: [
-              GestureDetector(
-                onTap: () => Get.toNamed(FavoriteScreen.namePath),
-                child: Icon(Icons.favorite_border),
-              ),
-              SizedBox(width: 20),
-            ],
             searchController: state.searchController,
-            searchHint: "Search books",
             onSearchChange: logic.searchBooks,
+            searchHint: "Search favorite books",
+            title: "Favorites",
           ),
 
           // content
@@ -41,6 +34,8 @@ class HomeScreen extends StatelessWidget {
                   ? SliverToBoxAdapter(
                       child: Center(child: CircularProgressIndicator()),
                     )
+                  : state.books.isEmpty
+                  ? SliverToBoxAdapter(child: EmptyInfo())
                   : SliverGrid(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
@@ -49,23 +44,10 @@ class HomeScreen extends StatelessWidget {
                         childAspectRatio: 0.45,
                       ),
                       delegate: SliverChildBuilderDelegate(
-                        (context, index) => IntrinsicHeight(
-                          child: CardItem(book: state.books[index]),
-                        ),
-
+                        (context, index) => CardItem(book: state.books[index]),
                         childCount: state.books.length,
                       ),
                     ),
-            ),
-          ),
-          Obx(
-            () => SliverToBoxAdapter(
-              child: state.isLoadingMore.value
-                  ? Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : SizedBox(),
             ),
           ),
         ],
