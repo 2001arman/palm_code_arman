@@ -1,14 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:palm_code_arman/domain/models/books_response.dart';
 import 'package:palm_code_arman/presentation/detail/detail_screen.dart';
 
 class CardItem extends StatelessWidget {
-  const CardItem({super.key});
+  final Book book;
+  const CardItem({super.key, required this.book});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.toNamed(DetailScreen.namePath),
+      onTap: () => Get.toNamed(DetailScreen.namePath, arguments: book),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
@@ -24,15 +27,13 @@ class CardItem extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 image: DecorationImage(
-                  image: NetworkImage(
-                    "https://www.gutenberg.org/cache/epub/84/pg84.cover.medium.jpg",
-                  ),
+                  image: CachedNetworkImageProvider(book.formats.imageJpeg),
                   fit: BoxFit.fill,
                 ),
               ),
               alignment: Alignment.topRight,
               padding: EdgeInsets.all(10),
-              child: Image.asset("assets/favorite.png", width: 30),
+              child: Image.asset("assets/unfavorite.png", width: 30),
             ),
             Padding(
               padding: const EdgeInsets.all(12),
@@ -40,13 +41,17 @@ class CardItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Fielding, Henry',
+                    book.authorName,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'History of Tom Jones, a Foundling',
+                    book.title,
                     style: TextStyle(fontSize: 12),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

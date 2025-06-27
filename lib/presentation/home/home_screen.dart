@@ -6,6 +6,7 @@ import 'package:palm_code_arman/presentation/widgets/card_item.dart';
 class HomeScreen extends StatelessWidget {
   static String namePath = "/home_screen";
   final logic = Get.find<HomeLogic>();
+  final state = Get.find<HomeLogic>().state;
   HomeScreen({super.key});
 
   @override
@@ -13,7 +14,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: CustomScrollView(
-        controller: ScrollController(),
+        controller: state.scrollController,
         slivers: [
           // app bar
           SliverAppBar(
@@ -35,19 +36,19 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Obx(
                       () => TextField(
-                        controller: logic.searchController,
-                        onChanged: (value) => logic.search.value = value,
+                        controller: state.searchController,
+                        onChanged: (value) => state.search.value = value,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
                           prefixIcon: Icon(Icons.search),
                           hintText: "Search books",
-                          suffixIcon: logic.search.value != ""
+                          suffixIcon: state.search.value != ""
                               ? IconButton(
                                   onPressed: () {
-                                    logic.searchController.text = "";
-                                    logic.search.value = "";
+                                    state.searchController.text = "";
+                                    state.search.value = "";
                                   },
                                   icon: Icon(Icons.clear),
                                 )
@@ -63,19 +64,35 @@ class HomeScreen extends StatelessWidget {
           ),
 
           // content
-          SliverPadding(
-            padding: const EdgeInsets.all(20),
-            sliver: SliverGrid(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 14,
-                crossAxisSpacing: 14,
-                childAspectRatio: 0.55,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => CardItem(),
-                childCount: 20,
-              ),
+          Obx(
+            () => SliverPadding(
+              padding: const EdgeInsets.all(20),
+              sliver: state.isLoading.value
+                  ? SliverToBoxAdapter(
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 14,
+                        crossAxisSpacing: 14,
+                        childAspectRatio: 0.51,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => CardItem(book: state.books[index]),
+                        childCount: state.books.length,
+                      ),
+                    ),
+            ),
+          ),
+          Obx(
+            () => SliverToBoxAdapter(
+              child: state.isLoadingMore.value
+                  ? Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : SizedBox(),
             ),
           ),
         ],

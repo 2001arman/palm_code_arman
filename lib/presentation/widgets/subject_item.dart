@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SubjectItem extends StatelessWidget {
-  const SubjectItem({super.key});
+  final String subject;
+  const SubjectItem({super.key, required this.subject});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +14,7 @@ class SubjectItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        "Adventure stories",
+        subject,
         style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
       ),
     );
