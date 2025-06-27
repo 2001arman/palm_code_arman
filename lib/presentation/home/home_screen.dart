@@ -13,6 +13,68 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget buildContent() {
+      if (state.isLoading.value) {
+        return const SliverToBoxAdapter(
+          child: Center(child: CircularProgressIndicator()),
+        );
+      }
+
+      if (state.isErrorFetch.value) {
+        return SliverToBoxAdapter(
+          child: GestureDetector(
+            onTap: () {
+              state.isLoading.value = true;
+              logic.getBooks();
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(Icons.replay_outlined, color: Colors.red),
+                SizedBox(height: 8),
+                Text("Error occurred, please try again!"),
+              ],
+            ),
+          ),
+        );
+      }
+
+      return SliverGrid(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 14,
+          crossAxisSpacing: 14,
+          childAspectRatio: 0.45,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) =>
+              IntrinsicHeight(child: CardItem(book: state.books[index])),
+          childCount: state.books.length,
+        ),
+      );
+    }
+
+    Widget buildLoadMoreFooter() {
+      if (state.isLoadingMore.value) {
+        return const Padding(
+          padding: EdgeInsets.all(16),
+          child: Center(child: CircularProgressIndicator()),
+        );
+      }
+
+      if (state.isErrorFetchMore.value) {
+        return GestureDetector(
+          onTap: () => logic.getMoreBook(url: state.nextPageUrl),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: const Icon(Icons.replay_outlined, color: Colors.red),
+          ),
+        );
+      }
+
+      return const SizedBox();
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: CustomScrollView(
@@ -37,37 +99,10 @@ class HomeScreen extends StatelessWidget {
           Obx(
             () => SliverPadding(
               padding: const EdgeInsets.all(20),
-              sliver: state.isLoading.value
-                  ? SliverToBoxAdapter(
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 14,
-                        crossAxisSpacing: 14,
-                        childAspectRatio: 0.45,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) => IntrinsicHeight(
-                          child: CardItem(book: state.books[index]),
-                        ),
-
-                        childCount: state.books.length,
-                      ),
-                    ),
+              sliver: buildContent(),
             ),
           ),
-          Obx(
-            () => SliverToBoxAdapter(
-              child: state.isLoadingMore.value
-                  ? Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : SizedBox(),
-            ),
-          ),
+          Obx(() => SliverToBoxAdapter(child: buildLoadMoreFooter())),
         ],
       ),
     );

@@ -14,7 +14,7 @@ class HomeLogic extends GetxController {
   @override
   void onInit() {
     // 1. get the local books as a initial data
-    getLocalBooks();
+    // getLocalBooks();
     // 2. get the actual books data from the API
     getBooks();
 
@@ -40,10 +40,14 @@ class HomeLogic extends GetxController {
     final data = await _bookAppService.getBooks();
     state.isLoading.value = false;
     data.fold(
-      (l) => ScaffoldMessenger.of(
-        Get.context!,
-      ).showSnackBar(errorSnackbar(errorText: "Error, ${l.message}")),
+      (l) {
+        ScaffoldMessenger.of(
+          Get.context!,
+        ).showSnackBar(errorSnackbar(errorText: "Error, ${l.message}"));
+        state.isErrorFetch.value = true;
+      },
       (r) {
+        state.isErrorFetch.value = false;
         state.books.assignAll(r.results);
         state.nextPageUrl = r.next;
       },
@@ -55,10 +59,11 @@ class HomeLogic extends GetxController {
     final data = await _bookAppService.getBooks(url: url);
     state.isLoadingMore.value = false;
     data.fold(
-      (l) => ScaffoldMessenger.of(
-        Get.context!,
-      ).showSnackBar(errorSnackbar(errorText: "Error, ${l.message}")),
+      (l) {
+        state.isErrorFetchMore.value = true;
+      },
       (r) {
+        state.isErrorFetchMore.value = false;
         state.books.addAll(r.results);
         state.nextPageUrl = r.next;
       },

@@ -10,5 +10,7 @@ class HomeState {
   RxList<Book> books = <Book>[].obs;
   RxBool isLoading = true.obs;
   RxBool isLoadingMore = false.obs;
+  RxBool isErrorFetch = false.obs;
+  RxBool isErrorFetchMore = false.obs;
   String? nextPageUrl;
 }
