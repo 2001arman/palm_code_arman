@@ -1,4 +1,6 @@
 import 'package:get/get_navigation/src/routes/get_route.dart';
+import 'package:palm_code_arman/presentation/detail/detail_binding.dart';
+import 'package:palm_code_arman/presentation/detail/detail_screen.dart';
 import 'package:palm_code_arman/presentation/home/home_binding.dart';
 import 'package:palm_code_arman/presentation/home/home_screen.dart';
 
@@ -9,6 +11,11 @@ class AppRoute {
       name: HomeScreen.namePath,
       page: () => HomeScreen(),
       binding: HomeBinding(),
+    ),
+    GetPage(
+      name: DetailScreen.namePath,
+      page: () => DetailScreen(),
+      binding: DetailBinding(),
     ),
   ];
 }

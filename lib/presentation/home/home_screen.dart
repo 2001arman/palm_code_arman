@@ -15,6 +15,7 @@ class HomeScreen extends StatelessWidget {
       body: CustomScrollView(
         controller: ScrollController(),
         slivers: [
+          // app bar
           SliverAppBar(
             title: Text('Palm Code Test Arman'),
             actions: [Icon(Icons.favorite_border), SizedBox(width: 20)],
@@ -61,6 +62,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
 
+          // content
           SliverPadding(
             padding: const EdgeInsets.all(20),
             sliver: SliverGrid(
