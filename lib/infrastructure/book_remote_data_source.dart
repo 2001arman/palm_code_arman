@@ -6,6 +6,11 @@ import 'package:palm_code_arman/domain/interface/book_remote_interface.dart';
 import 'package:palm_code_arman/domain/models/books_response.dart';
 
 class BookRemoteDataSource implements BookRemoteInterface {
+  final http.Client client;
+
+  BookRemoteDataSource({http.Client? client})
+    : client = client ?? http.Client();
+
   @override
   Future<Either<HttpException, BooksResponse>> getBooks(String url) async {
     try {
