@@ -57,7 +57,7 @@ class HomeLogic extends GetxController {
     _debounce?.cancel();
 
     _debounce = Timer(const Duration(milliseconds: 500), () async {
-      if (value == null || value.trim().isEmpty) return;
+      if (value == null || value.trim().isEmpty) return getBooks();
 
       state.search.value = value;
       state.isLoading.value = true;
