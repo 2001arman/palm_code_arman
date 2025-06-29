@@ -8,20 +8,22 @@ import 'package:palm_code_arman/presentation/home/home_state.dart';
 import 'package:palm_code_arman/presentation/widgets/error_snackbar.dart';
 
 class HomeLogic extends GetxController {
-  HomeState state = HomeState();
+  final state = HomeState();
   final BookAppService _bookAppService = BookAppService();
   Timer? _debounce;
 
   @override
   void onInit() {
-    getFavoriteBook();
-    // 1. get the local books as a initial data
-    getLocalBooks();
-    // 2. get the actual books data from the API
-    getBooks();
-
-    state.scrollController.addListener(_onScroll);
+    getFavoriteBooks();
     super.onInit();
+  }
+
+  @override
+  void onReady() async {
+    await getLocalBooks(); // get local cache first
+    getBooks(); // remote fetch
+    state.scrollController.addListener(_onScroll);
+    super.onReady();
   }
 
   @override
@@ -32,104 +34,111 @@ class HomeLogic extends GetxController {
     super.onClose();
   }
 
-  void getLocalBooks() async {
-    final data = await _bookAppService.loadCachedBooks();
-    state.books.assignAll(data);
-    state.isLoading.value = false;
+  Future<void> getLocalBooks() async {
+    final cached = await _bookAppService.loadCachedBooks();
+    state.books.assignAll(cached);
   }
 
   void getBooks() async {
-    final data = await _bookAppService.getBooks();
+    final result = await _bookAppService.getBooks();
     state.isLoading.value = false;
-    data.fold(
-      (l) {
-        ScaffoldMessenger.of(
-          Get.context!,
-        ).showSnackBar(errorSnackbar(errorText: "Error, ${l.message}"));
-        state.isErrorFetch.value = true;
+
+    result.fold(
+      (error) {
+        _showError("Error, ${error.message}");
+
+        if (state.books.isEmpty) {
+          state.isErrorFetch.value = true;
+        } else {
+          state.isErrorFetchMore.value = true;
+        }
       },
-      (r) {
-        state.isErrorFetch.value = false;
-        state.books.assignAll(r.results);
-        state.nextPageUrl = r.next;
+      (response) {
+        state
+          ..isErrorFetch.value = false
+          ..books.assignAll(response.results)
+          ..nextPageUrl = response.next;
       },
     );
   }
 
   void getMoreBook({String? url}) async {
     state.isLoadingMore.value = true;
-    final data = await _bookAppService.getBooks(url: url);
+    final result = await _bookAppService.getBooks(url: url);
     state.isLoadingMore.value = false;
-    data.fold(
-      (l) {
-        state.isErrorFetchMore.value = true;
-      },
-      (r) {
-        state.isErrorFetchMore.value = false;
-        state.books.addAll(r.results);
-        state.nextPageUrl = r.next;
-      },
-    );
+
+    result.fold((_) => state.isErrorFetchMore.value = true, (response) {
+      state
+        ..isErrorFetchMore.value = false
+        ..books.addAll(response.results)
+        ..nextPageUrl = response.next;
+    });
   }
 
   void _onScroll() {
     if (state.scrollController.position.pixels >=
-        state.scrollController.position.maxScrollExtent - 300) {
-      if (!state.isLoadingMore.value && state.nextPageUrl != null) {
-        getMoreBook(url: state.nextPageUrl);
-      }
+            state.scrollController.position.maxScrollExtent - 300 &&
+        !state.isLoadingMore.value &&
+        state.nextPageUrl != null) {
+      getMoreBook(url: state.nextPageUrl);
     }
   }
 
   void searchBooks(String? value) {
     _debounce?.cancel();
-
     _debounce = Timer(const Duration(milliseconds: 500), () async {
-      if (value == null || value.trim().isEmpty) return getBooks();
+      if (value == null || value.trim().isEmpty) {
+        getBooks();
+        return;
+      }
 
-      state.search.value = value;
-      state.isLoading.value = true;
+      state
+        ..search.value = value
+        ..isLoading.value = true;
 
-      final data = await _bookAppService.searchBook(value);
-
+      final result = await _bookAppService.searchBook(value);
       state.isLoading.value = false;
-      data.fold(
-        (l) => ScaffoldMessenger.of(
-          Get.context!,
-        ).showSnackBar(errorSnackbar(errorText: "Error, ${l.message}")),
-        (r) {
-          state.books.assignAll(r.results);
-          state.nextPageUrl = r.next;
-        },
-      );
+
+      result.fold((error) => _showError("Error, ${error.message}"), (response) {
+        state
+          ..books.assignAll(response.results)
+          ..nextPageUrl = response.next;
+      });
     });
   }
 
   void onClearSearch() {
-    state.searchController.text = "";
-    state.search.value = "";
+    state
+      ..searchController.clear()
+      ..search.value = "";
     getBooks();
   }
 
-  void getFavoriteBook() async {
-    final data = await _bookAppService.getFavoriteBooks();
-    state.favorites.assignAll(data);
+  void getFavoriteBooks() async {
+    final favorites = await _bookAppService.getFavoriteBooks();
+    state.favorites.assignAll(favorites);
   }
 
   void favoriteBookAction(Book book) {
-    final isAlreadyFavorite = state.favorites.any((f) => f.id == book.id);
+    final isFavorite = state.favorites.any((f) => f.id == book.id);
 
-    if (isAlreadyFavorite) {
+    if (isFavorite) {
       state.favorites.removeWhere((f) => f.id == book.id);
-      book.isFavorite?.value = false;
       _bookAppService.removeFavoriteBook(book: book);
+      book.isFavorite?.value = false;
     } else {
       state.favorites.add(book);
-      book.isFavorite?.value = true;
       _bookAppService.addFavoriteBook(book: book);
+      book.isFavorite?.value = true;
     }
 
     book.isFavorite?.refresh();
     state.favorites.refresh();
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(
+      Get.context!,
+    ).showSnackBar(errorSnackbar(errorText: message));
   }
 }
