@@ -19,7 +19,10 @@ class BookLocalDataSource implements BookLocalInterface {
 
     // Update or insert new files from API
     for (var file in books) {
-      await box.put(file.id, file); // insert and update
+      await box.put(
+        file.id,
+        file.copyWith(isFavorite: true),
+      ); // insert and update
     }
   }
 

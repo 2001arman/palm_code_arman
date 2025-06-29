@@ -54,4 +54,24 @@ class Book extends HiveObject {
     formats: Formats.fromJson(json["formats"]),
     isFavorite: false.obs,
   );
+
+  Book copyWith({
+    int? id,
+    String? title,
+    List<Author>? authors,
+    List<String>? summaries,
+    List<String>? subjects,
+    Formats? formats,
+    bool? isFavorite,
+  }) {
+    return Book(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      authors: authors ?? this.authors,
+      summaries: summaries ?? this.summaries,
+      subjects: subjects ?? this.subjects,
+      formats: formats ?? this.formats,
+      isFavorite: isFavorite?.obs ?? this.isFavorite,
+    );
+  }
 }
