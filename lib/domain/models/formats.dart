@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:hive/hive.dart';
-part 'formats.g.dart'; // Required for code generation
+part 'formats.g.dart';
 
 @HiveType(typeId: 2)
 class Formats {

@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'author.dart'; // Make sure Author is also a HiveObject
-import 'formats.dart'; // Make sure Formats is also a HiveObject
+import 'author.dart';
+import 'formats.dart';
 
-part 'book.g.dart'; // Required for code generation
+part 'book.g.dart';
 
 @HiveType(typeId: 0)
 class Book extends HiveObject {

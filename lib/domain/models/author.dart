@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:hive/hive.dart';
-part 'author.g.dart'; // Required for code generation
+part 'author.g.dart';
 
 @HiveType(typeId: 1)
 class Author {
