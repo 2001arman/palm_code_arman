@@ -87,14 +87,15 @@ class HomeLogic extends GetxController {
   void searchBooks(String? value) {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () async {
+      state
+        ..search.value = value ?? ''
+        ..isLoading.value = true
+        ..books.clear();
+
       if (value == null || value.trim().isEmpty) {
         getBooks();
         return;
       }
-
-      state
-        ..search.value = value
-        ..isLoading.value = true;
 
       final result = await _bookAppService.searchBook(value);
       state.isLoading.value = false;
@@ -116,6 +117,7 @@ class HomeLogic extends GetxController {
 
   void getFavoriteBooks() async {
     final favorites = await _bookAppService.getFavoriteBooks();
+    Get.log('cek favorites ${favorites.first.isFavorite}');
     state.favorites.assignAll(favorites);
   }
 

@@ -9,8 +9,13 @@ class BookLocalDataSource implements BookLocalInterface {
   @override
   Future<List<Book>> loadCachedBooks() async {
     var box = await Hive.openBox<Book>(_cacheBox);
+    final books = box.values.toList();
 
-    return box.values.toList();
+    for (var book in books) {
+      book.rehydrateFavorite(value: false);
+    }
+
+    return books;
   }
 
   @override
@@ -19,25 +24,30 @@ class BookLocalDataSource implements BookLocalInterface {
 
     // Update or insert new files from API
     for (var file in books) {
-      await box.put(
-        file.id,
-        file.copyWith(isFavorite: true),
-      ); // insert and update
+      await box.put(file.id, file); // insert and update
     }
   }
 
   @override
   Future<List<Book>> getFavoriteBooks() async {
     var box = await Hive.openBox<Book>(_favoriteBox);
+    final books = box.values.toList();
 
-    return box.values.toList();
+    for (var book in books) {
+      book.rehydrateFavorite(value: true);
+    }
+
+    return books;
   }
 
   @override
   void addFavoriteBook({required Book book}) async {
     var box = await Hive.openBox<Book>(_favoriteBox);
 
-    await box.put(book.id, book); // insert and update
+    await box.put(
+      book.id,
+      book.copyWith(isFavorite: true),
+    ); // insert and update
   }
 
   @override

@@ -75,3 +75,9 @@ class Book extends HiveObject {
     );
   }
 }
+
+extension BookRxExtension on Book {
+  void rehydrateFavorite({required bool value}) {
+    isFavorite = value.obs;
+  }
+}
