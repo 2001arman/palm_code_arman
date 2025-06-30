@@ -1,3 +1,4 @@
+import 'package:dynamic_height_grid_view/dynamic_height_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:palm_code_arman/presentation/favorite/favorite_screen.dart';
@@ -32,14 +33,12 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildBookGrid() {
-    return SliverGrid(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 14,
-        crossAxisSpacing: 14,
-        childAspectRatio: 0.45,
-      ),
-      delegate: SliverChildBuilderDelegate((context, index) {
+    return SliverDynamicHeightGridView(
+      itemCount: state.books.length,
+      crossAxisCount: 2,
+      mainAxisSpacing: 14,
+      crossAxisSpacing: 14,
+      builder: (context, index) {
         final book = state.books[index];
         final isFavorite = state.favorites.any((f) => f.id == book.id);
         book.isFavorite?.value = isFavorite;
@@ -51,7 +50,7 @@ class HomeScreen extends StatelessWidget {
             onFavoriteBook: logic.favoriteBookAction,
           ),
         );
-      }, childCount: state.books.length),
+      },
     );
   }
 

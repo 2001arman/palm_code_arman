@@ -24,7 +24,7 @@ class CardItem extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
           color: const Color(0xFFFCEFF0),
-          border: Border.all(width: 1, color: const Color(0xFFFCF7F7)),
+          border: Border.all(width: 1, color: const Color(0xFFFCEFF0)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

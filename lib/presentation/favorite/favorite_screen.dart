@@ -1,3 +1,4 @@
+import 'package:dynamic_height_grid_view/dynamic_height_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:palm_code_arman/presentation/home/home_logic.dart';
@@ -15,24 +16,22 @@ class FavoriteScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(title: Text("Favorites"), backgroundColor: Colors.white),
-      body: state.favorites.isEmpty
-          ? EmptyInfo()
-          : GridView(
-              padding: EdgeInsets.all(20),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: state.favorites.isEmpty
+            ? EmptyInfo()
+            : DynamicHeightGridView(
+                itemCount: state.favorites.length,
                 crossAxisCount: 2,
                 mainAxisSpacing: 14,
                 crossAxisSpacing: 14,
-                childAspectRatio: 0.45,
-              ),
-              children: state.favorites.map((data) {
-                return CardItem(
-                  book: data,
+                builder: (context, index) => CardItem(
+                  book: state.favorites[index],
                   onFavoriteBook: logic.favoriteBookAction,
-                  isFavorite: data.isFavorite ?? true.obs,
-                );
-              }).toList(),
-            ),
+                  isFavorite: state.favorites[index].isFavorite ?? true.obs,
+                ),
+              ),
+      ),
     );
   }
 }
