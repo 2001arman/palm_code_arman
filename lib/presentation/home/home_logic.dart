@@ -117,7 +117,6 @@ class HomeLogic extends GetxController {
 
   void getFavoriteBooks() async {
     final favorites = await _bookAppService.getFavoriteBooks();
-    Get.log('cek favorites ${favorites.first.isFavorite}');
     state.favorites.assignAll(favorites);
   }
 
